@@ -17,4 +17,6 @@ const movies = [
     liked: "84% ❤️",
     year: "October 4, 2013"
   }
-]
+];
+
+export default movies;
