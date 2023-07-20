@@ -1,47 +1,46 @@
 import React from 'react';
 
 class Timer extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
+    state = {
       hours: 0,
       minutes: 0,
       seconds: 0,
-      intervalRef: null
+      btnDisabled: false,
+      interval: "null",
+      intervalsStorage: ["1:05:15"],
     };
-  }
+  
 
   startTimer = () => {
-    if (!this.state.intervalRef) {
-      this.setState({
-        intervalRef: setInterval(() => {
-          this.setState((prevState) => {
-            const nextState = { ...prevState };
-
-            nextState.seconds++;
-
-            if (nextState.seconds >= 60) {
-              nextState.seconds = 0;
-              nextState.minutes++;
-
-              if (nextState.minutes >= 60) {
-                nextState.minutes = 0;
-                nextState.hours++;
-              }
+        this.setState({
+          btnDisabled: true,
+        });
+        let timer = setInterval(() => {
+          const {seconds, minutes, hours} = this.state;
+          if (seconds === 59) {
+            if (minutes === 59) {
+              this.setState({
+                seconds: 0,
+                minutes: minutes + 1,
+                hours: hours + 1,
+              });
             }
-
-            return nextState;
-          });
+          }else {
+            this.setState({
+              seconds: seconds + 1,
+            });
+          }
         }, 1000)
-      });
-    }
-  };
+        this.setState({
+          interval: timer,
+        })
+      };
 
   stopTimer = () => {
-    if (this.state.intervalRef) {
-      clearInterval(this.state.intervalRef);
-      this.setState({ intervalRef: null });
-    }
+    clearInterval(this.state.interval);
+    this.setState({
+      btnDisabled: false,
+    });
   };
 
   resetTimer = () => {
@@ -49,41 +48,19 @@ class Timer extends React.Component {
     this.setState({
       hours: 0,
       minutes: 0,
-      seconds: 0
+      seconds: 0,
+      intervalsStorage: []
     });
   };
-
   handleInterval = () => {
-    if (this.state.intervalRef) {
-      clearInterval(this.state.intervalRef);
-      this.setState({ intervalRef: null });
-    } else {
-      this.setState({
-        intervalRef: setInterval(() => {
-          this.setState((prevState) => {
-            const nextMinutes = prevState.minutes + 1;
-  
-            if (nextMinutes >= 60) {
-              return {
-                hours: prevState.hours + 1,
-                minutes: 0
-              };
-            }
-  
-            return { minutes: nextMinutes };
-          });
-        }, 10000)
-      });
-    }
+    const {hours, minutes, seconds, intervalsStorage} = this.state;
+    intervalsStorage.push(`${hours}:${minutes}:${seconds}`);
+    this.setState({
+      intervalsStorage,
+    });
   };
-
-  componentWillUnmount() {
-    this.stopTimer();
-  }
-
   render() {
-    const { hours, minutes, seconds } = this.state;
-
+    const { hours, minutes, seconds, btnDisabled, intervalsStorage } = this.state;
     return (
       <div className="timer-container">
         <h1 className='mb-4'><span>Online</span> Stopwatch</h1>
@@ -105,22 +82,25 @@ class Timer extends React.Component {
 
         <div className="timer-container text-center">
           <div className="timer-btn">
-            <button className='btn btn-success' onClick={this.startTimer}>Start</button>
+            <button className='btn btn-success' onClick={this.startTimer} disabled={btnDisabled}>Start</button>
           </div>
 
-          <div className="timer-btn">
+          <div className="timer-btn"> 
             <button className='btn btn-danger' onClick={this.stopTimer}>Stop</button>
           </div>
 
           <div className="timer-btn">
-            <button className='btn btn-secondary' onClick={this.handleInterval}>Interval</button>
+            <button className='btn btn-secondary' onClick={this.handleInterval} disabled={!btnDisabled}>Interval</button>
           </div>
 
           <div className="timer-btn">
             <button className='btn btn-warning' onClick={this.resetTimer}>Clear</button>
           </div>
         </div>
+        <div className="timer-container-intervals">
+          {intervalsStorage.map((item, index) => <p>{index} =&gt; {item}</p>)}
       </div>
+    </div>
     );
   }
 }
