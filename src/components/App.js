@@ -1,12 +1,16 @@
 import React from 'react';
-import Timer from './Timer'
+import Navbar from './Navbar'
+import Hero from './Hero';
+import Footer from './Footer';
 
 
 
 const App = () => {
   return (
     <div>
-      <Timer />
+      <Navbar />
+      <Hero />
+      <Footer />
     </div>
   );
 };
